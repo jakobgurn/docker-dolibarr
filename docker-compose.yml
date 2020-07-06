@@ -1,0 +1,43 @@
+version: "3.7"
+
+volumes:
+  dbdata:
+  doliwww:
+  dolidocs:
+  doliscripts:
+
+services:
+  db:
+    image: "mariadb"
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - "dbdata:/var/lib/mysql"
+    environment:
+      MYSQL_RANDOM_ROOT_PASSWORD: "yes"
+      MYSQL_DATABASE: "dolibarr"
+      MYSQL_USER: "dolibarr"
+      MYSQL_PASSWORD: "change_me"
+
+  doli:
+    build: .
+    depends_on:
+      - "db"
+    volumes:
+      - "doliwww:/var/www/html"
+      - "dolidocs:/var/www/documents"
+      - "doliscripts:/var/www/scripts"
+    ports:
+      - "8000:80"
+    environment:
+      DOLI_INSTALL_AUTO: 1
+      DOLI_PROD: 0
+      DOLI_DB_TYPE: "mysql"
+      DOLI_DB_HOST: "db"
+      DOLI_DB_PORT: "3306"
+      DOLI_DB_USER: "dolibarr"
+      DOLI_DB_PASSWORD: "tollesdolibarrpassword"
+      DOLI_DB_NAME: "dolibarr"
+      DOLI_ADMIN_LOGIN: "admin"
+      DOLI_ADMIN_PASSWORD: "admin"
+      DOLI_URL_ROOT: "http://localhost:8000"
+      PHP_INI_DATE_TIMEZONE: "Europe/Vienna"
